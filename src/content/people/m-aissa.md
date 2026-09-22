@@ -1,10 +1,12 @@
 ---
-name: "Mohamed Aissa"
+name: "Mohamed Aissa, PhD"
 status: current
 group: Project Office
-role: "Project Officer"
+role: "Senior Project Manager"
+links:
+  linkedin: https://www.linkedin.com/in/mohamed-h-aissa/
 order: 6
 featured: false
 ---
 
-Mohamed Aissa is a member of the TMPS Project Office.
+Mohamed Aissa is a Senior Project Manager in the TMPS Project Office.

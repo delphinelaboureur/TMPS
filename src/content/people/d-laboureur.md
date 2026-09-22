@@ -2,8 +2,8 @@
 name: "Delphine Laboureur, PhD"
 status: current
 group: Faculty
-role: "Research Group Leader"
-title: "Thermal Management and Process Safety Research Expertise Group"
+role: "Professor"
+title: "Research Group Leader — Thermal Management and Process Safety REG"
 links:
   email: delphine.laboureur@vki.ac.be
   scholar: https://scholar.google.com/citations?user=kU0VsS4AAAAJ&hl=fr

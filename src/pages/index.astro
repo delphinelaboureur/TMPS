@@ -1,0 +1,176 @@
+---
+import { Image } from "astro:assets";
+import BaseLayout from "../components/BaseLayout.astro";
+import { site } from "../data/site";
+import { getCollection } from "astro:content";
+import {
+  getPublications,
+  featuredMatcher,
+  featuredSorter,
+  AREA_LABELS,
+} from "../lib/content";
+import PubList from "../components/PubList.astro";
+import { withBase } from "../lib/url";
+
+const people = await getCollection("people");
+const pubs = await getPublications();
+// Featured = mentee-led or PI first/senior (>=2019), prioritized mentee-led
+// first then most recent.
+const recent = pubs
+  .filter(featuredMatcher(people))
+  .sort(featuredSorter(people))
+  .slice(0, 5);
+
+// Most recent lab-life photo, if any, for the homepage teaser.
+const galleryItems = (await getCollection("gallery")).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+const labPhoto = galleryItems[0];
+
+// Homepage "Research areas" cards, mirroring the Research page topics.
+const themes = [
+  {
+    slug: "heat-exchangers-am",
+    body: "Experimental characterization of heat exchangers produced by additive manufacturing.",
+  },
+  {
+    slug: "multiphase-heat-transfer",
+    body: "Numerical and experimental study of single- and multiphase heat transfer.",
+  },
+  {
+    slug: "dispersion-research",
+    body: "Dispersion and explosion research for improved process safety.",
+  },
+  {
+    slug: "ionic-propulsion",
+    body: "Investigation of ionic propulsion concepts and their underlying physics.",
+  },
+].map((t) => ({ title: AREA_LABELS[t.slug as keyof typeof AREA_LABELS], href: `/research#${t.slug}`, body: t.body }));
+---
+
+<BaseLayout>
+  <!-- Hero -->
+  <section class="bg-gradient-to-b from-primary-50 to-white">
+    <div class="container-page py-16 sm:py-20">
+      <div class="mx-auto max-w-3xl text-center">
+        <p class="text-sm font-semibold tracking-wide text-accent-600 uppercase">
+          {site.institution} · {site.university}
+        </p>
+        <h1
+          class="mt-4 text-4xl leading-tight font-semibold text-slate-900 sm:text-5xl"
+        >
+          {site.name}
+        </h1>
+        <p class="mx-auto mt-6 max-w-2xl text-lg text-slate-600">{site.description}</p>
+        <div class="mt-8 flex flex-wrap justify-center gap-3">
+          <a
+            href={withBase("/research")}
+            class="rounded-md bg-primary-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-800"
+            >Explore our research</a
+          >
+          <a
+            href={withBase("/people")}
+            class="rounded-md border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+            >Meet the team</a
+          >
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Research themes -->
+  <section class="container-page py-16">
+    <div class="mb-3 h-0.5 w-10 rounded-full bg-accent-500"></div>
+    <h2 class="mb-8 font-serif text-2xl text-slate-900">Research areas</h2>
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        themes.map((t) => (
+          <a
+            href={withBase(t.href)}
+            class="group rounded-xl border border-slate-200 p-6 transition-colors hover:border-primary-300 hover:bg-primary-50/40"
+          >
+            <h3 class="font-serif text-xl text-slate-900 group-hover:text-primary-700">
+              {t.title}
+            </h3>
+            <p class="mt-2 text-sm text-slate-600">{t.body}</p>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Recent featured publications -->
+  {
+    recent.length > 0 && (
+      <section class="border-t border-slate-200 bg-slate-50">
+        <div class="container-page py-16">
+          <div class="mb-6 flex items-end justify-between gap-4">
+            <div>
+              <div class="mb-3 h-0.5 w-10 rounded-full bg-accent-500" />
+              <h2 class="font-serif text-2xl text-slate-900">Recent work</h2>
+            </div>
+            <a
+              href={withBase("/publications")}
+              class="group inline-flex shrink-0 items-center gap-1 text-sm font-medium text-primary-700 transition-colors hover:text-accent-600"
+            >
+              All publications
+              <span
+                class="transition-transform group-hover:translate-x-0.5"
+                aria-hidden="true"
+              >
+                &rarr;
+              </span>
+            </a>
+          </div>
+          <PubList pubs={recent} />
+        </div>
+      </section>
+    )
+  }
+
+  <!-- Life in the lab -->
+  <section class="border-t border-slate-200 bg-white">
+    <div class="container-page py-16">
+      <div class="grid items-center gap-10 lg:grid-cols-2">
+        <div>
+          <div class="mb-3 h-0.5 w-10 rounded-full bg-accent-500"></div>
+          <h2 class="font-serif text-2xl text-slate-900">Life in the lab</h2>
+          <p class="mt-4 max-w-prose text-slate-600">
+            Science is a team sport. Beyond the bench, we celebrate milestones,
+            travel to conferences, and get out together.
+          </p>
+          <a
+            href={withBase("/lab-life")}
+            class="group mt-6 inline-flex items-center gap-1 text-sm font-medium text-primary-700 transition-colors hover:text-accent-600"
+          >
+            Explore lab life
+            <span
+              class="transition-transform group-hover:translate-x-0.5"
+              aria-hidden="true">&rarr;</span
+            >
+          </a>
+        </div>
+        <a
+          href={withBase("/lab-life")}
+          class="group block overflow-hidden rounded-2xl border border-slate-200 shadow-sm"
+        >
+          {
+            labPhoto ? (
+              <Image
+                src={labPhoto.data.image}
+                alt={labPhoto.data.caption}
+                widths={[600, 1000]}
+                sizes="(min-width: 1024px) 45vw, 90vw"
+                class="aspect-[16/9] w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+              />
+            ) : (
+              <div class="flex aspect-[16/9] w-full items-center justify-center bg-slate-50 text-sm text-slate-500">
+                Photos coming soon
+              </div>
+            )
+          }
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
